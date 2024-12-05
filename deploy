@@ -1,0 +1,146 @@
+sudo nano /etc/nginx/sites-available/english
+
+/etc/nginx/sites-enable/english
+
+server {
+    listen       8012;
+    server_name  206.189.36.11;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location /static/ {
+        root /var/www/english;
+    }
+
+    location /media/ {
+        root /var/www/english;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/var/www/english/english.sock;
+    }
+}
+
+
+
+
+
+
+
+/etc/systemd/system/english.service
+
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/english
+ExecStart=/var/www/english/.venv/bin/gunicorn --workers 1 --bind unix:/var/www/english/english.sock root.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+/var/www/projects/e-english
+
+
+sudo systemctl stop english.service
+sudo systemctl enable english.service
+sudo systemctl start english.service
+sudo systemctl status english.service
+sudo systemctl restart english.service
+
+
+sudo systemctl stop english_celery.service
+sudo systemctl enable english_celery.service
+sudo systemctl start english_celery.service
+sudo systemctl status english_celery.service
+sudo systemctl restart english_celery.service
+
+
+sudo systemctl restart nginx.service
+
+
+systemctl restart nginx.service
+
+1. comp -> github, gitlab, bitbucket -> server
+
+2. comp -> server
+
+
+
+scp file root@IP:/var/www
+python3 manage.py runserver 0:8000
+
+
+
+/etc/nginx/sites-available/falcon
+ln -s /etc/nginx/sites-available/english    /etc/nginx/sites-enabled/
+
+/etc/nginx/sites-enabled/
+
+
+
+/etc/systemd/system/english_celery.service
+
+
+======================= Celery Beat Service =======================
+[Unit]
+Description=Celery Beat Service
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/english
+Environment="PATH=/var/www/english/.venv/bin"
+ExecStart=/var/www/english/.venv/bin/celery -A root beat --loglevel=info
+
+[Install]
+WantedBy=multi-user.target
+
+
+======================= Celery Service =======================
+
+
+[Unit]
+Description=Celery Service
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/english
+Environment="PATH=/var/www/english/.venv/bin"
+ExecStart=/var/www/english/.venv/bin/celery -A root worker --loglevel=info
+
+[Install]
+WantedBy=multi-user.target
+
+
+CELERY SERVICE
+
+sudo nano /etc/systemd/system/e_english_celery.service
+
+
+
+WorkingDirectory=/var/www/english
+ExecStart=/var/www/english/.venv/bin/gunicorn --workers 1 --bind unix:/var/www/english/falcon.sock root.wsgi:application
+
+
+
+docker run --name redis_container -p 6379:6379 -d redis:alpine -> ce90e4eedb95b378cecd2dfad7232ce17e56d4a3656ca956bfb698aa67a52b9e
+
+docker run --name postgres_container -e POSTGRES_PASSWORD=1 -p 5432:5432 -d postgres:alpine -> a033671a6d869bac4a9235d57cf7bfa8cdffa6d0740f585269dac4651b5de299
+
+
+docker run --name postgres_container -e POSTGRES_PASSWORD=1 -p 5432:5432 -d postgres:alpine -> database xam qoshib yaratib yuboradi
+
+
+name xato bob qolgan shulardi togirlashim kerak
+
