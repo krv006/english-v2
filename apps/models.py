@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser
-from django.db.models import EmailField, BooleanField, Model, CharField, DateTimeField, ImageField, SlugField
+from django.core.validators import FileExtensionValidator
+from django.db.models import EmailField, BooleanField, Model, CharField, DateTimeField, ImageField, SlugField, FileField
 from django.db.models import TextChoices, Model
 from django.utils.text import slugify
 
@@ -46,3 +47,15 @@ class Books(Model):
 
     def __str__(self):
         return self.name
+
+
+class Test(Model):
+    en = CharField(max_length=255)
+    uz = CharField(max_length=255)
+    audio_file = FileField(upload_to='test_audio/', validators=[
+        FileExtensionValidator(allowed_extensions=['mp3', 'wav'])
+    ])
+    # unit = ForeignKey('apps.Units', CASCADE, related_name='tests')
+
+    # def __str__(self):
+    #     return f"Test in English: {self.en} (Unit: {self.unit.name})"
