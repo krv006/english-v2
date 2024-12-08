@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
-from django.db.models import EmailField, BooleanField, Model, CharField, DateTimeField, ImageField, SlugField, FileField
+from django.db.models import EmailField, BooleanField, Model, CharField, DateTimeField, ImageField, SlugField, \
+    FileField, ForeignKey, CASCADE
 from django.db.models import TextChoices, Model
 from django.utils.text import slugify
 
@@ -49,13 +50,29 @@ class Books(Model):
         return self.name
 
 
+class Units(Model):
+    name = CharField(max_length=255)
+    book = ForeignKey('apps.Books', CASCADE, related_name='units')
+    file = FileField(upload_to='units_files/', validators=[
+        FileExtensionValidator(allowed_extensions=['pdf', 'docx', 'txt'])
+    ])
+
+    def __str__(self):
+        return f"Unit: {self.name} (Book: {self.book.name})"
+
+
 class Test(Model):
     en = CharField(max_length=255)
     uz = CharField(max_length=255)
     audio_file = FileField(upload_to='test_audio/', validators=[
         FileExtensionValidator(allowed_extensions=['mp3', 'wav'])
     ])
-    # unit = ForeignKey('apps.Units', CASCADE, related_name='tests')
+    unit = ForeignKey('apps.Units', CASCADE, related_name='tests')
 
-    # def __str__(self):
-    #     return f"Test in English: {self.en} (Unit: {self.unit.name})"
+    def __str__(self):
+        return f"Test in English: {self.en} (Unit: {self.unit.name})"
+
+
+class AdminSiteSettings(Model):
+    created_by = ImageField(upload_to='created_by/')
+    connection = CharField(max_length=255)
