@@ -3,16 +3,20 @@ import string
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import ListCreateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import User
+from apps.filters import UnitFilterSet, TestFilterSet
+from apps.models import User, Books, Units, AdminSiteSettings, Test
 from apps.serializers import (
     LoginSerializer,
     LoginUserModelSerializer,
-    RegisterSerializer,
+    RegisterSerializer, AdminSiteSettingsModelSerializer, TestModelSerializer, UnitsModelSerializer,
+    BooksModelSerializer, UserModelSerializer
+
 )
 from apps.task import send_verification_email
 
@@ -87,3 +91,36 @@ class LoginAPIView(GenericAPIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['user'])
+class UserListCreateAPIView(ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserModelSerializer
+
+
+@extend_schema(tags=['book'])
+class BooksViewSet(ModelViewSet):
+    queryset = Books.objects.all()
+    serializer_class = BooksModelSerializer
+    permission_classes = [AllowAny, ]
+
+
+@extend_schema(tags=['units'])
+class UnitsViewSet(ModelViewSet):
+    queryset = Units.objects.all()
+    serializer_class = UnitsModelSerializer
+    filterset_class = UnitFilterSet
+
+
+@extend_schema(tags=['admin_settings'])
+class AdminSiteSettingsListCreateAPIView(ListCreateAPIView):
+    queryset = AdminSiteSettings.objects.all()
+    serializer_class = AdminSiteSettingsModelSerializer
+
+
+@extend_schema(tags=['test'])
+class TestViewSet(ModelViewSet):
+    queryset = Test.objects.all()
+    serializer_class = TestModelSerializer
+    filterset_class = TestFilterSet
